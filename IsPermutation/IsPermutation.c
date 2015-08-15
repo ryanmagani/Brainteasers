@@ -1,6 +1,9 @@
 #define DEBUG 0
 #include <stdio.h>
 
+// Runtime: O(c^2)
+	// O(c) 	  for size comparison
+	// O(c^2 - c) for shifting
 // this code should realistically never be used,
 // it's a brainteaser example of how to check if
 // string A is a permutation of string B with the
@@ -59,6 +62,7 @@ int isPermutation(char * stA, char * stB)
 	}
 
 // REGION: compare length
+// O(c)
 	// travel to the end of one/both of the arrays
 	while (*stA && *stB)
 	{
@@ -77,79 +81,68 @@ int isPermutation(char * stA, char * stB)
 	stA--;
 	stB--;
 
-	// continue to go back one byte until A's pointer
-	// now points to the null terminator of A. This is
-	// correct iff our assumptions are true
-	while (*stA)
-	{
-		stA--;
-		stB--;
-	}
-
-	// go forward one byte, we should be poining at the
-	// beginning of both strings which we now know
-	// are the same length
-	stA++;
-	stB++;
-
 	if (DEBUG)
 	{
 		printf("2: ptrA: %p, ptrB: %p\n", stA, stB);
 	}
 // ENDREGION
 
-// REGION: loop through B, removing equal chars from A until either a char is
-// not found, or A is entirely 00 and stB points one left of the terminator
-	// for all the characters in string B
-	while (*stB)
+// REGION: loop backwards through A, removing equal chars from B until either a
+// char is not found, or B is entirely 00 and stA points one right of the terminator
+// Worst case is a reversed and no duplicates string, every character will shift
+// the string by the number of characters remaining
+// O(c^2 - c)
+	// for all the characters in string A
+	while (*stA)
 	{
-		// for all characters in string A
-		while (*stA)
+		// for all characters in string B
+		while (*stB)
 		{
 			// if we match
-			if (*stA == *stB)
+			if (*stB == *stA)
 			{
 				// remove this char from the string and shift
-				// the remaining characters to the right
-				while (*stA)
+				// the remaining characters to the left
+				while (*stB)
 				{
-					*stA = *(stA - 1);
-					stA--;
+					*stB = *(stB + 1);
+					stB++;
 				}
 
 				// we're pointing to 0x00 and we just
-				// moved that value to our right, move
-				// right two chars to get to the new
-				// beginning of A
-				stA++;
-				stA++;
+				// moved 0x00 to our left, move
+				// left two chars to get to the new
+				// end of B
+				stB--;
+				stB--;
 
-				// if the beginning of A is now 0x00, and the
-				// next byte of B is B's null terminator, then
-				// it is a permutation
-				if (!*stA && !*(stB + 1))
+				// if the end of B is now 0x00, and the
+				// byte to the left of stA is A's null terminator, then
+				// the strings are a permutations
+				if (!*stB && !*(stA - 1))
 				{
 					return 1;
 				}
 
+				// we break here where `!*stB` is guaranteed to be 
+				// false so that we can use that `!*stB` to see if
+				// we've searched through all chars and are
+				// now at the beginning of the string without a match
 				break;
 			}
-			stA++;
+			stB--;
 		}
 
-		// if we didn't find the char, return false
-		if (!*stA)
+		// if we finished the inner loop and are now back
+		// at the beginning of the string, we didn't find
+		// the char from A in B, so it is not a permutation
+		if (!*stB)
 		{
 			return 0;
 		}
 
-		// move our A pointer back to the beginning of A
-		while (*stA)
-		{
-			stA--;
-		}
-		stA++;
-		stB++;
+		// increment the outer loop
+		stA--;
 	}
 // ENDREGION
 

@@ -1,15 +1,14 @@
 #include <stdio.h>
-void test(char * stA, char * stB, char a, char b, int isPerm)
+int test(char * stA, char * stB, char a, char b, int isPerm)
 {
 	if (isPermutation(stA, stB) == isPerm)
 	{
 		printf("correct %c, %c\n", a, b);
+		return 0;
 	}
 
-	else
-	{
-		printf("ERROR: %c, %c\n", a, b);
-	}
+	printf("ERROR: %c, %c\n", a, b);
+	return 1;
 }
 
 int main (void)
@@ -38,12 +37,21 @@ int main (void)
 	char o[] = "";
 	char p[] = "a";
 
-	test(a, b, 'a', 'b', 0);
-	test(c, d, 'c', 'd', 1);
-	test(e, f, 'e', 'f', 0);
-	test(g, h, 'g', 'h', 0);
-	test(i, j, 'i', 'j', 1);
-	test(k, l, 'k', 'l', 1);
-	test(m, n, 'm', 'n', 1);
-	test(o, p, 'o', 'p', 0);
+	int res = 0;
+
+	res += test(a, b, 'a', 'b', 0);
+	res += test(c, d, 'c', 'd', 1);
+	res += test(e, f, 'e', 'f', 0);
+	res += test(g, h, 'g', 'h', 0);
+	res += test(i, j, 'i', 'j', 1);
+	res += test(k, l, 'k', 'l', 1);
+	res += test(m, n, 'm', 'n', 1);
+	res += test(o, p, 'o', 'p', 0);
+
+	if (res == 0)
+	{
+		printf("All tests passed \n");
+	}
+
+	return 0;
 }
